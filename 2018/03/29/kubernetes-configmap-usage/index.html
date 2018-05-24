@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html>
+    <!-- title -->
+
+
+
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" >
+    <meta name="author" content="Dongamp">
+    <meta name="renderer" content="webkit">
+    <meta name="copyright" content="Dongamp">
+    <meta name="keywords" content="Hexo | Dongamp">
+    <meta name="description" content="">
+    <meta name="Cache-Control" content="no-cache">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+    <title>Kubernetes ConfigMap使用 · Dongamp</title>
+    <style type="text/css">
+    @font-face {
+        font-family: 'Oswald-Regular';
+        src: url("/font/Oswald-Regular.ttf");
+    }
+
+    body {
+        margin: 0;
+    }
+
+    header,
+    footer,
+    .back-top,
+    .sidebar,
+    .container,
+    .site-intro-meta,
+    .toc-wrapper {
+        display: none;
+    }
+
+    .site-intro {
+        position: relative;
+        z-index: 3;
+        width: 100%;
+        /* height: 50vh; */
+        overflow: hidden;
+    }
+
+    .site-intro-placeholder {
+        position: absolute;
+        z-index: -2;
+        top: 0;
+        left: 0;
+        width: calc(100% + 300px);
+        height: 100%;
+        background: repeating-linear-gradient(-45deg, #444 0, #444 80px, #333 80px, #333 160px);
+        background-position: center center;
+        transform: translate3d(-226px, 0, 0);
+        animation: gradient-move 2.5s ease-out 0s 1;
+    }
+
+    @keyframes gradient-move {
+        0% {
+            transform: translate3d(-226px, 0, 0);
+        }
+        100% {
+            transform: translate3d(0, 0, 0);
+        }
+    }
+
+</style>
+
+    <link rel="preload" href= /css/style.css?v=20180501 as="style" onload="this.onload=null;this.rel='stylesheet'" />
+    <link rel="stylesheet" href= /css/mobile.css?v=20180501 media="(max-width: 980px)">
+    
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'" />
+        
+    <!-- /*! loadCSS. [c]2017 Filament Group, Inc. MIT License */
+/* This file is meant as a standalone workflow for
+- testing support for link[rel=preload]
+- enabling async CSS loading in browsers that do not support rel=preload
+- applying rel preload css once loaded, whether supported or not.
+*/ -->
+<script>
+(function( w ){
+	"use strict";
+	// rel=preload support test
+	if( !w.loadCSS ){
+		w.loadCSS = function(){};
+	}
+	// define on the loadCSS obj
+	var rp = loadCSS.relpreload = {};
+	// rel=preload feature support test
+	// runs once and returns a function for compat purposes
+	rp.support = (function(){
+		var ret;
+		try {
+			ret = w.document.createElement( "link" ).relList.supports( "preload" );
+		} catch (e) {
+			ret = false;
+		}
+		return function(){
+			return ret;
+		};
+	})();
+
+	// if preload isn't supported, get an asynchronous load by using a non-matching media attribute
+	// then change that media back to its intended value on load
+	rp.bindMediaToggle = function( link ){
+		// remember existing media attr for ultimate state, or default to 'all'
+		var finalMedia = link.media || "all";
+
+		function enableStylesheet(){
+			link.media = finalMedia;
+		}
+
+		// bind load handlers to enable media
+		if( link.addEventListener ){
+			link.addEventListener( "load", enableStylesheet );
+		} else if( link.attachEvent ){
+			link.attachEvent( "onload", enableStylesheet );
+		}
+
+		// Set rel and non-applicable media type to start an async request
+		// note: timeout allows this to happen async to let rendering continue in IE
+		setTimeout(function(){
+			link.rel = "stylesheet";
+			link.media = "only x";
+		});
+		// also enable media after 3 seconds,
+		// which will catch very old browsers (android 2.x, old firefox) that don't support onload on link
+		setTimeout( enableStylesheet, 3000 );
+	};
+
+	// loop through link elements in DOM
+	rp.poly = function(){
+		// double check this to prevent external calls from running
+		if( rp.support() ){
+			return;
+		}
+		var links = w.document.getElementsByTagName( "link" );
+		for( var i = 0; i < links.length; i++ ){
+			var link = links[ i ];
+			// qualify links to those with rel=preload and as=style attrs
+			if( link.rel === "preload" && link.getAttribute( "as" ) === "style" && !link.getAttribute( "data-loadcss" ) ){
+				// prevent rerunning on link
+				link.setAttribute( "data-loadcss", true );
+				// bind listeners to toggle media back
+				rp.bindMediaToggle( link );
+			}
+		}
+	};
+
+	// if unsupported, run the polyfill
+	if( !rp.support() ){
+		// run once at least
+		rp.poly();
+
+		// rerun poly on an interval until onload
+		var run = w.setInterval( rp.poly, 500 );
+		if( w.addEventListener ){
+			w.addEventListener( "load", function(){
+				rp.poly();
+				w.clearInterval( run );
+			} );
+		} else if( w.attachEvent ){
+			w.attachEvent( "onload", function(){
+				rp.poly();
+				w.clearInterval( run );
+			} );
+		}
+	}
+
+
+	// commonjs
+	if( typeof exports !== "undefined" ){
+		exports.loadCSS = loadCSS;
+	}
+	else {
+		w.loadCSS = loadCSS;
+	}
+}( typeof global !== "undefined" ? global : this ) );
+</script>
+
+    <link rel="icon" href= "/assets/favicon.ico" />
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/webfontloader@1.6.28/webfontloader.min.js" as="script" />    
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js" as="script" />
+    <link rel="preload" href="/scripts/main.js" as="script" />
+    <link rel="preload" as="font" href="/font/Oswald-Regular.ttf" crossorigin>
+    <link rel="preload" as="font" href="https://at.alicdn.com/t/font_327081_1dta1rlogw17zaor.woff" crossorigin>
+    <!-- 百度统计  -->
+    
+    <!-- 谷歌统计  -->
+    
+</head>
+
+    
+        <body class="post-body">
+    
+    
+<header class="header">
+
+    <div class="read-progress"></div>
+    <div class="header-sidebar-menu">&#xe775;</div>
+    <!-- post页的toggle banner  -->
+    
+    <div class="banner">
+            <div class="blog-title">
+                <a href="/" >Dongamp blog</a>
+            </div>
+            <div class="post-title">
+                <a href="#" class="post-name">Kubernetes ConfigMap使用</a>
+            </div>
+    </div>
+    
+    <a class="home-link" href=/>Dongamp blog</a>
+</header>
+    <div class="wrapper">
+        <div class="site-intro" style=
+
+
+
+
+
+
+
+
+height:30vh;
+
+>
+    
+    <!-- 主页  -->
+    
+    
+    <!-- 404页  -->
+            
+    <div class="site-intro-placeholder"></div>
+    <div class="site-intro-img" style="background-image: url(https://dn-maxfunweb.qbox.me/imagepost-bg.jpg)"></div>
+    <div class="site-intro-meta">
+        <!-- 标题  -->
+        <h1 class="intro-title">
+            <!-- 主页  -->
+            
+            Kubernetes ConfigMap使用
+            <!-- 404 -->
+            
+        </h1>
+        <!-- 副标题 -->
+        <p class="intro-subtitle">
+            <!-- 主页副标题  -->
+            
+            
+            <!-- 404 -->
+            
+        </p>
+        <!-- 文章页meta -->
+        
+            <!-- 文章页标签  -->
+            
+                <div class= post-intro-tags >
+    
+        <a class="post-tag" href="javascript:void(0);" data-tags = "kubernetes">kubernetes</a>
+    
+        <a class="post-tag" href="javascript:void(0);" data-tags = "configmap">configmap</a>
+    
+</div>
+            
+            <div class="post-intro-meta">
+                <span class="post-intro-calander iconfont-archer">&#xe676;</span>
+                <span class="post-intro-time">2018/03/29</span>
+                
+                <span id="busuanzi_container_page_pv" class="busuanzi-pv">
+                    <span class="iconfont-archer">&#xe602;</span>
+                    <span id="busuanzi_value_page_pv"></span>
+                </span>
+                
+                <span class="shareWrapper">
+                    <span class="iconfont-archer shareIcon">&#xe71d;</span>
+                    <span class="shareText">Share</span>
+                    <ul class="shareList">
+                        <li class="iconfont-archer share-qr" data-type="qr">&#xe75b;
+                            <div class="share-qrcode"></div>
+                        </li>
+                        <li class="iconfont-archer" data-type="weibo">&#xe619;</li>
+                        <li class="iconfont-archer" data-type="qzone">&#xe62e;</li>
+                        <li class="iconfont-archer" data-type="twitter">&#xe634;</li>
+                        <li class="iconfont-archer" data-type="facebook">&#xe67a;</li>
+                    </ul>
+                </span>
+            </div>
+        
+    </div>
+</div>
+        <script>
+  // load webfont-loader async, and add callback function
+  function async(u, cb, err) {
+    var d = document, t = 'script',
+      o = d.createElement(t),
+      s = d.getElementsByTagName(t)[0];
+    o.src = u;
+    if (cb) { o.addEventListener('load', function (e) { cb(null, e); }, false); }
+    if (err) { o.addEventListener('error', function (e) { err(null, e); }, false); }
+    s.parentNode.insertBefore(o, s);
+  }
+  
+  // get user agent
+  var browser = {
+    versions: function () {
+      var u = window.navigator.userAgent;
+      return {
+        userAgent: u,
+        trident: u.indexOf('Trident') > -1, //IE内核
+        presto: u.indexOf('Presto') > -1, //opera内核
+        webKit: u.indexOf('AppleWebKit') > -1, //苹果、谷歌内核
+        gecko: u.indexOf('Gecko') > -1 && u.indexOf('KHTML') == -1, //火狐内核
+        mobile: !!u.match(/AppleWebKit.*Mobile.*/), //是否为移动终端
+        ios: !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/), //ios终端
+        android: u.indexOf('Android') > -1 || u.indexOf('Linux') > -1, //android终端或者uc浏览器
+        iPhone: u.indexOf('iPhone') > -1 || u.indexOf('Mac') > -1, //是否为iPhone或者安卓QQ浏览器
+        iPad: u.indexOf('iPad') > -1, //是否为iPad
+        webApp: u.indexOf('Safari') == -1, //是否为web应用程序，没有头部与底部
+        weixin: u.indexOf('MicroMessenger') == -1, //是否为微信浏览器
+        uc: u.indexOf('UCBrowser') > -1 //是否为android下的UC浏览器
+      };
+    }()
+  }
+  console.log("userAgent:" + browser.versions.userAgent);
+
+  // callback
+  function fontLoaded() {
+    console.log('font loaded');
+    if (document.getElementsByClassName('site-intro-meta')) {
+      document.getElementsByClassName('intro-title')[0].classList.add('intro-fade-in');
+      document.getElementsByClassName('intro-subtitle')[0].classList.add('intro-fade-in');
+      var postIntroTags = document.getElementsByClassName('post-intro-tags')[0],
+        postIntroMeat = document.getElementsByClassName('post-intro-meta')[0];
+      if (postIntroTags) {
+        postIntroTags.classList.add('post-fade-in');
+      }
+      if (postIntroMeat) {
+        postIntroMeat.classList.add('post-fade-in');
+      }
+    }
+  }
+
+  // UC不支持跨域，所以直接显示
+  function asyncCb(){
+    if (browser.versions.uc) {
+      console.log("UCBrowser");
+      fontLoaded();
+    } else {
+      WebFont.load({
+        custom: {
+          families: ['Oswald-Regular']
+        },
+        loading: function () {  //所有字体开始加载
+          // console.log('loading');
+        },
+        active: function () {  //所有字体已渲染
+          fontLoaded();
+        },
+        inactive: function () { //字体预加载失败，无效字体或浏览器不支持加载
+          console.log('inactive: timeout');
+          fontLoaded();
+        },
+        timeout: 5000 // Set the timeout to two seconds
+      });
+    }
+  }
+
+  function asyncErr(){
+    console.warn('script load from CDN failed, will load local script')
+  }
+
+  var asyncLoadWithFallBack = function(arr, success, reject) {
+      var currReject = function(){
+        reject()
+        arr.shift()
+        if(arr.length)
+          async(arr[0], success, currReject)
+        }
+
+      async(arr[0], success, currReject)
+  }
+
+  asyncLoadWithFallBack([
+    "https://cdn.jsdelivr.net/npm/webfontloader@1.6.28/webfontloader.min.js", 
+    "https://cdn.bootcss.com/webfont/1.6.28/webfontloader.js",
+    "/lib/webfontloader.min.js"
+  ], asyncCb, asyncErr)
+</script>        
+        <img class="loading" src="/assets/loading.svg" style="display: block; margin: 6rem auto 0 auto; width: 6rem; height: 6rem;" />
+        <div class="container container-unloaded">
+            <main class="main post-page">
+    <article class="article-entry">
+        <p>摘自：<a href="https://jimmysong.io/kubernetes-handbook/concepts/configmap.html" target="_blank" rel="noopener">https://jimmysong.io/kubernetes-handbook/concepts/configmap.html</a></p>
+<h2 id="ConfigMap"><a href="#ConfigMap" class="headerlink" title="ConfigMap"></a>ConfigMap</h2><p>其实ConfigMap功能在Kubernetes1.2版本的时候就有了，许多应用程序会从配置文件、命令行参数或环境变量中读取配置信息。这些配置信息需要与docker image解耦，你总不能每修改一个配置就重做一个image吧？ConfigMap API给我们提供了向容器中注入配置信息的机制，ConfigMap可以被用来保存单个属性，也可以用来保存整个配置文件或者JSON二进制大对象。</p>
+<h2 id="ConfigMap概览"><a href="#ConfigMap概览" class="headerlink" title="ConfigMap概览"></a>ConfigMap概览</h2><p>ConfigMap API资源用来保存key-value pair配置数据，这个数据可以在pods里使用，或者被用来为像controller一样的系统组件存储配置数据。虽然ConfigMap跟Secrets类似，但是ConfigMap更方便的处理不含敏感信息的字符串。 注意：ConfigMaps不是属性配置文件的替代品。ConfigMaps只是作为多个properties文件的引用。你可以把它理解为Linux系统中的/etc目录，专门用来存储配置文件的目录。下面举个例子，使用ConfigMap配置来创建Kuberntes Volumes，ConfigMap中的每个data项都会成为一个新文件。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">kind: ConfigMap</span><br><span class="line">apiVersion: v1</span><br><span class="line">metadata:</span><br><span class="line">  creationTimestamp: 2016-02-18T19:14:38Z</span><br><span class="line">  name: example-config</span><br><span class="line">  namespace: default</span><br><span class="line">data:</span><br><span class="line">  example.property.1: hello</span><br><span class="line">  example.property.2: world</span><br><span class="line">  example.property.file: |-</span><br><span class="line">    property.1=value-1</span><br><span class="line">    property.2=value-2</span><br><span class="line">    property.3=value-3</span><br></pre></td></tr></table></figure>
+<p>data一栏包括了配置数据，ConfigMap可以被用来保存单个属性，也可以用来保存一个配置文件。 配置数据可以通过很多种方式在Pods里被使用。ConfigMaps可以被用来：</p>
+<p>设置环境变量的值<br>在容器里设置命令行参数<br>在数据卷里面创建config文件<br>用户和系统组件两者都可以在ConfigMap里面存储配置数据。</p>
+<p>其实不用看下面的文章，直接从kubectl create configmap -h的帮助信息中就可以对ConfigMap究竟如何创建略知一二了。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">Examples:</span><br><span class="line">  # Create a new configmap named my-config based on folder bar</span><br><span class="line">  kubectl create configmap my-config --from-file=path/to/bar</span><br><span class="line"></span><br><span class="line">  # Create a new configmap named my-config with specified keys instead of file basenames on disk</span><br><span class="line">  kubectl create configmap my-config --from-file=key1=/path/to/bar/file1.txt --from-file=key2=/path/to/bar/file2.txt</span><br><span class="line"></span><br><span class="line">  # Create a new configmap named my-config with key1=config1 and key2=config2</span><br><span class="line">  kubectl create configmap my-config --from-literal=key1=config1 --from-literal=key2=config2</span><br></pre></td></tr></table></figure>
+<h2 id="创建ConfigMaps"><a href="#创建ConfigMaps" class="headerlink" title="创建ConfigMaps"></a>创建ConfigMaps</h2><p>可以使用该命令，用给定值、文件或目录来创建ConfigMap。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">kubectl create configmap</span><br></pre></td></tr></table></figure></p>
+<h3 id="使用目录创建"><a href="#使用目录创建" class="headerlink" title="使用目录创建"></a>使用目录创建</h3><p>比如我们已经有个了包含一些配置文件，其中包含了我们想要设置的ConfigMap的值：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">$ ls docs/user-guide/configmap/kubectl/</span><br><span class="line">game.properties</span><br><span class="line">ui.properties</span><br><span class="line"></span><br><span class="line">$ cat docs/user-guide/configmap/kubectl/game.properties</span><br><span class="line">enemies=aliens</span><br><span class="line">lives=3</span><br><span class="line">enemies.cheat=true</span><br><span class="line">enemies.cheat.level=noGoodRotten</span><br><span class="line">secret.code.passphrase=UUDDLRLRBABAS</span><br><span class="line">secret.code.allowed=true</span><br><span class="line">secret.code.lives=30</span><br><span class="line"></span><br><span class="line">$ cat docs/user-guide/configmap/kubectl/ui.properties</span><br><span class="line">color.good=purple</span><br><span class="line">color.bad=yellow</span><br><span class="line">allow.textmode=true</span><br><span class="line">how.nice.to.look=fairlyNice</span><br></pre></td></tr></table></figure></p>
+<p>使用下面的命令可以创建一个包含目录中所有文件的ConfigMap。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ kubectl create configmap game-config --from-file=docs/user-guide/configmap/kubectl</span><br></pre></td></tr></table></figure>
+<p>—from-file指定在目录下的所有文件都会被用在ConfigMap里面创建一个键值对，键的名字就是文件名，值就是文件的内容。</p>
+<p>让我们来看一下这个命令创建的ConfigMap：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">$ kubectl describe configmaps game-config</span><br><span class="line">Name:           game-config</span><br><span class="line">Namespace:      default</span><br><span class="line">Labels:         &lt;none&gt;</span><br><span class="line">Annotations:    &lt;none&gt;</span><br><span class="line"></span><br><span class="line">Data</span><br><span class="line">====</span><br><span class="line">game.properties:        158 bytes</span><br><span class="line">ui.properties:          83 bytes</span><br></pre></td></tr></table></figure></p>
+<p>我们可以看到那两个key是从kubectl指定的目录中的文件名。这些key的内容可能会很大，所以在kubectl describe的输出中，只能够看到键的名字和他们的大小。 如果想要看到键的值的话，可以使用kubectl get：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ kubectl get configmaps game-config -o yaml</span><br></pre></td></tr></table></figure>
+<h3 id="使用文件创建"><a href="#使用文件创建" class="headerlink" title="使用文件创建"></a>使用文件创建</h3><p>刚才使用目录创建的时候我们—from-file指定的是一个目录，只要指定为一个文件就可以从单个文件中创建ConfigMap。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ kubectl create configmap game-config-2 --from-file=docs/user-guide/configmap/kubectl/game.properties </span><br><span class="line"></span><br><span class="line">$ kubectl get configmaps game-config-2 -o yaml</span><br></pre></td></tr></table></figure>
+<p>—from-file这个参数可以使用多次，你可以使用两次分别指定上个实例中的那两个配置文件，效果就跟指定整个目录是一样的。</p>
+<h3 id="使用字面值创建"><a href="#使用字面值创建" class="headerlink" title="使用字面值创建"></a>使用字面值创建</h3><p>使用文字值创建，利用—from-literal参数传递配置信息，该参数可以使用多次，格式如下；</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ kubectl create configmap special-config --from-literal=special.how=very --from-literal=special.type=charm</span><br><span class="line"></span><br><span class="line">$ kubectl get configmaps special-config -o yaml</span><br></pre></td></tr></table></figure>
+<h2 id="Pod中使用ConfigMap"><a href="#Pod中使用ConfigMap" class="headerlink" title="Pod中使用ConfigMap"></a>Pod中使用ConfigMap</h2><p>使用ConfigMap来替代环境变量<br>ConfigMap可以被用来填入环境变量。看下下面的ConfigMap。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">apiVersion: v1</span><br><span class="line">kind: ConfigMap</span><br><span class="line">metadata:</span><br><span class="line">  name: special-config</span><br><span class="line">  namespace: default</span><br><span class="line">data:</span><br><span class="line">  special.how: very</span><br><span class="line">  special.type: charm</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">apiVersion: v1</span><br><span class="line">kind: ConfigMap</span><br><span class="line">metadata:</span><br><span class="line">  name: env-config</span><br><span class="line">  namespace: default</span><br><span class="line">data:</span><br><span class="line">  log_level: INFO</span><br></pre></td></tr></table></figure>
+<p>我们可以在Pod中这样使用ConfigMap：</p>
+<h3 id="使用ConfigMap来替代环境变量"><a href="#使用ConfigMap来替代环境变量" class="headerlink" title="使用ConfigMap来替代环境变量"></a>使用ConfigMap来替代环境变量</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">apiVersion: v1</span><br><span class="line">kind: Pod</span><br><span class="line">metadata:</span><br><span class="line">  name: dapi-test-pod</span><br><span class="line">spec:</span><br><span class="line">  containers:</span><br><span class="line">    - name: test-container</span><br><span class="line">      image: gcr.io/google_containers/busybox</span><br><span class="line">      command: [ &quot;/bin/sh&quot;, &quot;-c&quot;, &quot;env&quot; ]</span><br><span class="line">      env:</span><br><span class="line">        - name: SPECIAL_LEVEL_KEY</span><br><span class="line">          valueFrom:</span><br><span class="line">            configMapKeyRef:</span><br><span class="line">              name: special-config</span><br><span class="line">              key: special.how</span><br><span class="line">        - name: SPECIAL_TYPE_KEY</span><br><span class="line">          valueFrom:</span><br><span class="line">            configMapKeyRef:</span><br><span class="line">              name: special-config</span><br><span class="line">              key: special.type</span><br><span class="line">      envFrom:</span><br><span class="line">        - configMapRef:</span><br><span class="line">            name: env-config</span><br><span class="line">  restartPolicy: Never</span><br></pre></td></tr></table></figure>
+<p>这个Pod运行后会输出如下几行：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">SPECIAL_LEVEL_KEY=very</span><br><span class="line">SPECIAL_TYPE_KEY=charm</span><br><span class="line">log_level=INFO</span><br></pre></td></tr></table></figure></p>
+<h3 id="用ConfigMap设置命令行参数"><a href="#用ConfigMap设置命令行参数" class="headerlink" title="用ConfigMap设置命令行参数"></a>用ConfigMap设置命令行参数</h3><p>ConfigMap也可以被使用来设置容器中的命令或者参数值。它使用的是Kubernetes的$(VAR_NAME)替换语法。我们看下下面这个ConfigMap。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">apiVersion: v1</span><br><span class="line">kind: ConfigMap</span><br><span class="line">metadata:</span><br><span class="line">  name: special-config</span><br><span class="line">  namespace: default</span><br><span class="line">data:</span><br><span class="line">  special.how: very</span><br><span class="line">  special.type: charm</span><br></pre></td></tr></table></figure></p>
+<p>为了将ConfigMap中的值注入到命令行的参数里面，我们还要像前面那个例子一样使用环境变量替换语法${VAR_NAME)。（其实这个东西就是给Docker容器设置环境变量，以前我创建镜像的时候经常这么玩，通过docker run的时候指定-e参数修改镜像里的环境变量，然后docker的CMD命令再利用该$(VAR_NAME)通过sed来修改配置文件或者作为命令行启动参数。）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">apiVersion: v1</span><br><span class="line">kind: Pod</span><br><span class="line">metadata:</span><br><span class="line">  name: dapi-test-pod</span><br><span class="line">spec:</span><br><span class="line">  containers:</span><br><span class="line">    - name: test-container</span><br><span class="line">      image: gcr.io/google_containers/busybox</span><br><span class="line">      command: [ &quot;/bin/sh&quot;, &quot;-c&quot;, &quot;echo $(SPECIAL_LEVEL_KEY) $(SPECIAL_TYPE_KEY)&quot; ]</span><br><span class="line">      env:</span><br><span class="line">        - name: SPECIAL_LEVEL_KEY</span><br><span class="line">          valueFrom:</span><br><span class="line">            configMapKeyRef:</span><br><span class="line">              name: special-config</span><br><span class="line">              key: special.how</span><br><span class="line">        - name: SPECIAL_TYPE_KEY</span><br><span class="line">          valueFrom:</span><br><span class="line">            configMapKeyRef:</span><br><span class="line">              name: special-config</span><br><span class="line">              key: special.type</span><br><span class="line">  restartPolicy: Never</span><br></pre></td></tr></table></figure>
+<h3 id="通过数据卷插件使用ConfigMap"><a href="#通过数据卷插件使用ConfigMap" class="headerlink" title="通过数据卷插件使用ConfigMap"></a>通过数据卷插件使用ConfigMap</h3><p>在数据卷里面使用这个ConfigMap，有不同的选项。最基本的就是将文件填入数据卷，在这个文件中，键就是文件名，键值就是文件内容：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">apiVersion: v1</span><br><span class="line">kind: Pod</span><br><span class="line">metadata:</span><br><span class="line">  name: dapi-test-pod</span><br><span class="line">spec:</span><br><span class="line">  containers:</span><br><span class="line">    - name: test-container</span><br><span class="line">      image: gcr.io/google_containers/busybox</span><br><span class="line">      command: [ &quot;/bin/sh&quot;, &quot;-c&quot;, &quot;cat /etc/config/special.how&quot; ]</span><br><span class="line">      volumeMounts:</span><br><span class="line">      - name: config-volume</span><br><span class="line">        mountPath: /etc/config</span><br><span class="line">  volumes:</span><br><span class="line">    - name: config-volume</span><br><span class="line">      configMap:</span><br><span class="line">        name: special-config</span><br><span class="line">  restartPolicy: Never</span><br></pre></td></tr></table></figure></p>
+<p>我们也可以在ConfigMap值被映射的数据卷里控制路径。<br>使用前面创建的game-config<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">apiVersion: v1</span><br><span class="line">kind: Pod</span><br><span class="line">metadata:</span><br><span class="line">  name: dapi-test-pod</span><br><span class="line">spec:</span><br><span class="line">  containers:</span><br><span class="line">    - name: test-container</span><br><span class="line">      image: busybox</span><br><span class="line">      command: [ &quot;/bin/sh&quot;,&quot;-c&quot;,&quot;ls /etc/config&quot; ]</span><br><span class="line">      volumeMounts:</span><br><span class="line">      - name: config-volume</span><br><span class="line">        mountPath: /etc/config</span><br><span class="line">  volumes:</span><br><span class="line">    - name: config-volume</span><br><span class="line">      configMap:</span><br><span class="line">        name: game-config</span><br><span class="line">  restartPolicy: Never</span><br></pre></td></tr></table></figure></p>
+<p>查看pod日志里面打印出/etc/config目录下的文件<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ kubectl logs dapi-test-pod test-container</span><br><span class="line"></span><br><span class="line">game.properties</span><br><span class="line">ui.properties</span><br></pre></td></tr></table></figure></p>
+
+    </article>
+    <!-- license  -->
+    
+        <div class="license-wrapper">
+            <p>原文作者: <a href="https://dongamp1990.github.io">Dongamp</a>
+            <p>原文链接: <a href="https://dongamp1990.github.io/2018/03/29/kubernetes-configmap-usage/">https://dongamp1990.github.io/2018/03/29/kubernetes-configmap-usage/</a>
+            <p>发表日期: <a href="https://dongamp1990.github.io/2018/03/29/kubernetes-configmap-usage/">March 29th 2018, 12:00:00</a>
+            <p>版权声明: 本文采用<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
+        </div>
+    
+    <!-- paginator  -->
+    <ul class="post-paginator">
+        <li class="next">
+            
+                <div class="nextSlogan">Next Post</div>
+                <a href= "/2018/04/02/docker-traefik-usage/" title= Docker Swarm集群使用Traefik >
+                    <div class="nextTitle">Docker Swarm集群使用Traefik</div>
+                </a>
+            
+        </li>
+        <li class="previous">
+            
+                <div class="prevSlogan">Previous Post</div>
+                <a href= "/2018/03/29/kubernetes-java-client/" title= Kubernetes Java Client使用 >
+                    <div class="prevTitle">Kubernetes Java Client使用</div>
+                </a>
+            
+        </li>
+    </ul>
+    <!-- 评论插件 -->
+    <!-- 来必力City版安装代码 -->
+
+<!-- City版安装代码已完成 -->
+    
+    
+    <!--PC版-->
+
+    <!--PC版-->
+
+
+    
+    <!-- 评论 -->
+</main>
+            <!-- profile -->
+            
+        </div>
+        <footer class="footer footer-unloaded">
+    <!-- social  -->
+    
+    <div class="social">
+        
+    
+        
+            
+                <a href="mailto:dongamp1990@gmail.com" class="iconfont-archer email" title=email ></a>
+            
+        
+    
+        
+            
+                <a href="https://github.com/dongamp1990" class="iconfont-archer github" target="_blank" title=github></a>
+            
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+
+    </div>
+    
+    <!-- powered by Hexo  -->
+    <div class="copyright">
+        <span id="hexo-power">Powered by <a href="https://hexo.io/" target="_blank">Hexo</a></span><span class="iconfont-archer power">&#xe635;</span><span id="theme-info">theme <a href="https://github.com/fi3ework/hexo-theme-archer" target="_blank">Archer</a></span>
+    </div>
+    <!-- 不蒜子  -->
+    
+    <div class="busuanzi-container">
+        <span id="busuanzi_container_site_pv">PV: <span id="busuanzi_value_site_pv"></span>
+        </span>
+    </div>
+    
+</footer>
+    </div>
+    <!-- toc -->
+    
+    <div class="toc-wrapper" style=
+    
+
+
+
+
+
+
+
+top:30vh;
+
+    >
+        <div class="toc-catalog">
+            <span class="iconfont-archer catalog-icon">&#xe613;</span><span>CATALOG</span>
+        </div>
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#ConfigMap"><span class="toc-number">1.</span> <span class="toc-text">ConfigMap</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#ConfigMap概览"><span class="toc-number">2.</span> <span class="toc-text">ConfigMap概览</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#创建ConfigMaps"><span class="toc-number">3.</span> <span class="toc-text">创建ConfigMaps</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#使用目录创建"><span class="toc-number">3.1.</span> <span class="toc-text">使用目录创建</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#使用文件创建"><span class="toc-number">3.2.</span> <span class="toc-text">使用文件创建</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#使用字面值创建"><span class="toc-number">3.3.</span> <span class="toc-text">使用字面值创建</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Pod中使用ConfigMap"><span class="toc-number">4.</span> <span class="toc-text">Pod中使用ConfigMap</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#使用ConfigMap来替代环境变量"><span class="toc-number">4.1.</span> <span class="toc-text">使用ConfigMap来替代环境变量</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#用ConfigMap设置命令行参数"><span class="toc-number">4.2.</span> <span class="toc-text">用ConfigMap设置命令行参数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#通过数据卷插件使用ConfigMap"><span class="toc-number">4.3.</span> <span class="toc-text">通过数据卷插件使用ConfigMap</span></a></li></ol></li></ol>
+    </div>
+    
+    <div class="back-top iconfont-archer">&#xe639;</div>
+    <div class="sidebar sidebar-hide">
+    <ul class="sidebar-tabs sidebar-tabs-active-0">
+        <li class="sidebar-tab-archives"><span class="iconfont-archer">&#xe67d;</span><span class="tab-name">Archive</span></li>
+        <li class="sidebar-tab-tags"><span class="iconfont-archer">&#xe61b;</span><span class="tab-name">Tag</span></li>
+        <li class="sidebar-tab-categories"><span class="iconfont-archer">&#xe666;</span><span class="tab-name">Cate</span></li>
+    </ul>
+    <div class="sidebar-content sidebar-content-show-archive">
+          <div class="sidebar-panel-archives">
+    <!-- 在ejs中将archive按照时间排序 -->
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <div class="total-archive"> Total : 7 </div>
+    
+    <div class="post-archive">
+    
+    
+    
+    
+    <div class="archive-year"> 2018 </div>
+    <ul class="year-list">
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">05/24</span><a class="archive-post-title" href= "/2018/05/24/elasticsearch-fluent-kibana/" >Elasticsearch+Fluentd+Kibana使用</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">04/02</span><a class="archive-post-title" href= "/2018/04/02/docker-traefik-usage/" >Docker Swarm集群使用Traefik</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">03/29</span><a class="archive-post-title" href= "/2018/03/29/kubernetes-java-client/" >Kubernetes Java Client使用</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">03/29</span><a class="archive-post-title" href= "/2018/03/29/kubernetes-configmap-usage/" >Kubernetes ConfigMap使用</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">03/11</span><a class="archive-post-title" href= "/2018/03/11/Kubernetes-deploy-Jenkins-slave/" >Kubernetes部署Jenkins并动态资源分配</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">03/01</span><a class="archive-post-title" href= "/2018/03/01/Dockerfile-syntax/" >Dockerfile语法结构</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">01/11</span><a class="archive-post-title" href= "/2018/01/11/docker-install-note/" >安装Docker日志</a>
+        </li>
+    
+    </div>
+  </div>
+        <div class="sidebar-panel-tags">
+    <div class="sidebar-tags-name">
+    
+        <span class="sidebar-tag-name" data-tags="docker"><span class="iconfont-archer">&#xe606;</span>docker</span>
+    
+        <span class="sidebar-tag-name" data-tags="kubernetes"><span class="iconfont-archer">&#xe606;</span>kubernetes</span>
+    
+        <span class="sidebar-tag-name" data-tags="jenkins"><span class="iconfont-archer">&#xe606;</span>jenkins</span>
+    
+        <span class="sidebar-tag-name" data-tags="configmap"><span class="iconfont-archer">&#xe606;</span>configmap</span>
+    
+        <span class="sidebar-tag-name" data-tags="elasticsearch"><span class="iconfont-archer">&#xe606;</span>elasticsearch</span>
+    
+        <span class="sidebar-tag-name" data-tags="Elasticsearch"><span class="iconfont-archer">&#xe606;</span>Elasticsearch</span>
+    
+        <span class="sidebar-tag-name" data-tags="Docker"><span class="iconfont-archer">&#xe606;</span>Docker</span>
+    
+        <span class="sidebar-tag-name" data-tags="Fluentd"><span class="iconfont-archer">&#xe606;</span>Fluentd</span>
+    
+        <span class="sidebar-tag-name" data-tags="Kibana"><span class="iconfont-archer">&#xe606;</span>Kibana</span>
+    
+    </div>
+    <div class="iconfont-archer sidebar-tags-empty">&#xe678;</div>
+    <div class="tag-load-fail" style="display: none; color: #ccc; font-size: 0.6rem;">
+    缺失模块。<br/>
+    1、请确保node版本大于6.2<br/>
+    2、在博客根目录（注意不是archer根目录）执行以下命令：<br/>
+    <span style="color: #f75357; font-size: 1rem; line-height: 2rem;">npm i hexo-generator-json-content --save</span><br/>
+    3、在根目录_config.yml里添加配置：
+    <pre style="color: #787878; font-size: 0.6rem;">
+jsonContent:
+  meta: false
+  pages: false
+  posts:
+    title: true
+    date: true
+    path: true
+    text: false
+    raw: false
+    content: false
+    slug: false
+    updated: false
+    comments: false
+    link: false
+    permalink: false
+    excerpt: false
+    categories: true
+    tags: true</pre>
+    </div> 
+    <div class="sidebar-tags-list"></div>
+</div>
+        <div class="sidebar-panel-categories">
+    <div class="sidebar-categories-name">
+    
+    </div>
+    <div class="iconfont-archer sidebar-categories-empty">&#xe678;</div>
+    <div class="sidebar-categories-list"></div>
+</div>
+    </div>
+</div> 
+    <script>
+    var siteMeta = {
+        root: '/',
+        author: 'Dongamp'
+    }
+</script>
+    <!-- CDN failover -->
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script>
+    <script type="text/javascript">
+        if (typeof window.$ === 'undefined')
+        {
+            console.warn('jquery load from jsdelivr failed, will load local script')
+            document.write('<script src="/lib/jquery.min.js">\x3C/script>')
+        }
+    </script>
+    <script src="/scripts/main.js"></script>
+    <!-- busuanzi  -->
+    
+    <script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    
+    <!-- CNZZ  -->
+    
+    </div>
+    <!-- async load share.js -->
+    
+        <script src="/scripts/share.js" async></script>    
+    
+    </body>
+</html>
+
+

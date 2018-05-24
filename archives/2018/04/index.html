@@ -336,30 +336,23 @@
     
     
         <article class="index-post">
-            <a class="abstract-title" href = "/2018/05/24/elasticsearch-fluent-kibana/" >
+            <a class="abstract-title" href = "/2018/04/02/docker-traefik-usage/" >
                 
-                    <span>Elasticsearch+Fluentd+Kibana使用</span>
+                    <span>Docker Swarm集群使用Traefik</span>
             </a>
             <div class="abstract-content">
-                前言分布式应用，部署在Docker中，日志分散在各个服务器上，为了方便查看日志，在应用中使用Fluentd把日志收集起来，存放到Elasticsearch中，使用Kibana来查看日志，分析等
-...
+                前言Træfɪk 是一个为了让部署微服务更加便捷而诞生的现代HTTP反向代理、负载均衡工具。 它支持多种后台 (Docker, Swarm, Kubernetes, Marathon, Meso...
             </div>
             <div class="abstract-post-meta">
                 <!-- date  -->
                 <div class="abstract-date">
-                    <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2018/05/24</span>
+                    <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2018/04/02</span>
                 </div>
                 <!-- tags  -->
                 
                 <div class= abstract-tags >
     
-        <a class="post-tag" href="javascript:void(0);" data-tags = "Elasticsearch">Elasticsearch</a>
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags = "Docker">Docker</a>
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags = "Fluentd">Fluentd</a>
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags = "Kibana">Kibana</a>
+        <a class="post-tag" href="javascript:void(0);" data-tags = "docker">docker</a>
     
 </div>
                 
@@ -599,69 +592,6 @@
     缺失模块。<br/>
     1、请确保node版本大于6.2<br/>
     2、在博客根目录（注意不是archer根目录）执行以下命令：<br/>
-    <span style="color: #f75357; font-size: 1rem; line-height: 2rem;">npm i hexo-generator-json-content --save</span><br/>
-    3、在根目录_config.yml里添加配置：
-    <pre style="color: #787878; font-size: 0.6rem;">
-jsonContent:
-  meta: false
-  pages: false
-  posts:
-    title: true
-    date: true
-    path: true
-    text: false
-    raw: false
-    content: false
-    slug: false
-    updated: false
-    comments: false
-    link: false
-    permalink: false
-    excerpt: false
-    categories: true
-    tags: true</pre>
-    </div> 
-    <div class="sidebar-tags-list"></div>
-</div>
-        <div class="sidebar-panel-categories">
-    <div class="sidebar-categories-name">
-    
-    </div>
-    <div class="iconfont-archer sidebar-categories-empty">&#xe678;</div>
-    <div class="sidebar-categories-list"></div>
-</div>
-    </div>
-</div> 
-    <script>
-    var siteMeta = {
-        root: '/',
-        author: 'Dongamp'
-    }
-</script>
-    <!-- CDN failover -->
-    <script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script>
-    <script type="text/javascript">
-        if (typeof window.$ === 'undefined')
-        {
-            console.warn('jquery load from jsdelivr failed, will load local script')
-            document.write('<script src="/lib/jquery.min.js">\x3C/script>')
-        }
-    </script>
-    <script src="/scripts/main.js"></script>
-    <!-- busuanzi  -->
-    
-    <script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
-    
-    <!-- CNZZ  -->
-    
-    </div>
-    <!-- async load share.js -->
-    
-    </body>
-</html>
-
-
-��意不是archer根目录）执行以下命令：<br/>
     <span style="color: #f75357; font-size: 1rem; line-height: 2rem;">npm i hexo-generator-json-content --save</span><br/>
     3、在根目录_config.yml里添加配置：
     <pre style="color: #787878; font-size: 0.6rem;">
