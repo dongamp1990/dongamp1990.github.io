@@ -1,6 +1,11 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
     <!-- title -->
+
+
+
+
+<!-- keywords -->
 
 
 
@@ -11,11 +16,13 @@
     <meta name="author" content="Dongamp">
     <meta name="renderer" content="webkit">
     <meta name="copyright" content="Dongamp">
-    <meta name="keywords" content="Hexo | Dongamp">
+    
+    <meta name="keywords" content="dongamp,dongamp1990,kevin">
+    
     <meta name="description" content="">
-    <meta name="Cache-Control" content="no-cache">
+    <meta http-equiv="Cache-control" content="no-cache">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
-    <title>Dongamp</title>
+    <title>Dongamp Studio</title>
     <style type="text/css">
     @font-face {
         font-family: 'Oswald-Regular';
@@ -54,7 +61,7 @@
         background: repeating-linear-gradient(-45deg, #444 0, #444 80px, #333 80px, #333 160px);
         background-position: center center;
         transform: translate3d(-226px, 0, 0);
-        animation: gradient-move 2.5s ease-out 0s 1;
+        animation: gradient-move 2.5s ease-out 0s infinite;
     }
 
     @keyframes gradient-move {
@@ -68,9 +75,11 @@
 
 </style>
 
-    <link rel="preload" href= /css/style.css?v=20180501 as="style" onload="this.onload=null;this.rel='stylesheet'" />
-    <link rel="stylesheet" href= /css/mobile.css?v=20180501 media="(max-width: 980px)">
-        
+    <link rel="preload" href= "/css/style.css?v=20180824" as="style" onload="this.onload=null;this.rel='stylesheet'" />
+    <link rel="stylesheet" href= "/css/mobile.css?v=20180824" media="(max-width: 980px)">
+    
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'" />
+    
     <!-- /*! loadCSS. [c]2017 Filament Group, Inc. MIT License */
 /* This file is meant as a standalone workflow for
 - testing support for link[rel=preload]
@@ -179,11 +188,14 @@
 </script>
 
     <link rel="icon" href= "/assets/favicon.ico" />
-    <link rel="preload" href="https://cdn.jsdelivr.net/npm/webfontloader@1.6.28/webfontloader.min.js" as="script" />    
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/webfontloader@1.6.28/webfontloader.min.js" as="script" />
     <link rel="preload" href="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js" as="script" />
     <link rel="preload" href="/scripts/main.js" as="script" />
     <link rel="preload" as="font" href="/font/Oswald-Regular.ttf" crossorigin>
     <link rel="preload" as="font" href="https://at.alicdn.com/t/font_327081_1dta1rlogw17zaor.woff" crossorigin>
+    
+    <!-- fancybox -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.js" defer></script>
     <!-- 百度统计  -->
     
     <!-- 谷歌统计  -->
@@ -201,16 +213,14 @@
     <a class="home-link" href=/>Dongamp blog</a>
 </header>
     <div class="wrapper">
-        <div class="site-intro" style=
+        <div class="site-intro" style="
 
 
 
 
 
 
-
-
->
+">
     
     <!-- 主页  -->
             
@@ -232,17 +242,7 @@
     </div>
 </div>
         <script>
-  // load webfont-loader async, and add callback function
-  function async(u, cb, err) {
-    var d = document, t = 'script',
-      o = d.createElement(t),
-      s = d.getElementsByTagName(t)[0];
-    o.src = u;
-    if (cb) { o.addEventListener('load', function (e) { cb(null, e); }, false); }
-    if (err) { o.addEventListener('error', function (e) { err(null, e); }, false); }
-    s.parentNode.insertBefore(o, s);
-  }
-  
+ 
   // get user agent
   var browser = {
     versions: function () {
@@ -272,13 +272,9 @@
     if (document.getElementsByClassName('site-intro-meta')) {
       document.getElementsByClassName('intro-title')[0].classList.add('intro-fade-in');
       document.getElementsByClassName('intro-subtitle')[0].classList.add('intro-fade-in');
-      var postIntroTags = document.getElementsByClassName('post-intro-tags')[0],
-        postIntroMeat = document.getElementsByClassName('post-intro-meta')[0];
-      if (postIntroTags) {
-        postIntroTags.classList.add('post-fade-in');
-      }
-      if (postIntroMeat) {
-        postIntroMeat.classList.add('post-fade-in');
+      var postIntros = document.getElementsByClassName('post-intros')[0]
+      if (postIntros) {
+        postIntros.classList.add('post-fade-in');
       }
     }
   }
@@ -312,6 +308,17 @@
     console.warn('script load from CDN failed, will load local script')
   }
 
+  // load webfont-loader async, and add callback function
+  function async(u, cb, err) {
+    var d = document, t = 'script',
+      o = d.createElement(t),
+      s = d.getElementsByTagName(t)[0];
+    o.src = u;
+    if (cb) { o.addEventListener('load', function (e) { cb(null, e); }, false); }
+    if (err) { o.addEventListener('error', function (e) { err(null, e); }, false); }
+    s.parentNode.insertBefore(o, s);
+  }
+
   var asyncLoadWithFallBack = function(arr, success, reject) {
       var currReject = function(){
         reject()
@@ -335,31 +342,34 @@
     
     
     
-        <article class="index-post">
-            <a class="abstract-title" href = "/2018/06/26/kafka-cluster/" >
-                
-                    <span>使用Docker快速搭建Kafka集群</span>
-            </a>
-            <div class="abstract-content">
-                前言工作项目中使用到了MeessageQueue，原来是使用阿里云的MQ，是按使用量收费的，用了一段时间感觉数据量还是蛮大的，所以打算自己搭建消息队列服务器，先前测试过RabbitMQ，使用ra...
+    
+    
+    
+    <article class="index-post">
+        <a class="abstract-title" href = "/2018/06/26/kafka-cluster/" >
+            
+                <span>使用Docker快速搭建Kafka集群</span>
+        </a>
+        <div class="abstract-content">
+            前言工作项目中使用到了MeessageQueue，原来是使用阿里云的MQ，是按使用量收费的，用了一段时间感觉数据量还是蛮大的，所以打算自己搭建消息队列服务器，先前测试过RabbitMQ，使用ra...
+        </div>
+        <div class="abstract-post-meta">
+            <!-- date  -->
+            <div class="abstract-date">
+                <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2018/06/26</span>
             </div>
-            <div class="abstract-post-meta">
-                <!-- date  -->
-                <div class="abstract-date">
-                    <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2018/06/26</span>
-                </div>
-                <!-- tags  -->
-                
-                <div class= abstract-tags >
+            <!-- tags  -->
+            
+            <div class= abstract-tags >
     
         <a class="post-tag" href="javascript:void(0);" data-tags = "docker">docker</a>
     
         <a class="post-tag" href="javascript:void(0);" data-tags = "kafka">kafka</a>
     
 </div>
-                
-            </div>
-        </article>
+            
+        </div>
+    </article>
     
     <!-- paginator  -->
     
@@ -411,6 +421,14 @@
     
         
     
+        
+    
+        
+    
+        
+    
+        
+    
 
     </div>
     
@@ -421,8 +439,10 @@
     <!-- 不蒜子  -->
     
     <div class="busuanzi-container">
-        <span id="busuanzi_container_site_pv">PV: <span id="busuanzi_value_site_pv"></span>
-        </span>
+    
+     
+    <span id="busuanzi_container_site_pv">PV: <span id="busuanzi_value_site_pv"></span> :)</span>
+    
     </div>
     
 </footer>
@@ -567,7 +587,21 @@
     
     
     
-    <div class="total-archive"> Total : 10 </div>
+    
+    
+    
+    
+    
+    
+    
+    
+    <div class="total-and-search">
+        <div class="total-archive">
+        Total : 10
+        </div>
+        <!-- search  -->
+        
+    </div>
     
     <div class="post-archive">
     
@@ -604,12 +638,12 @@
     
     
         <li class="archive-post-item">
-            <span class="archive-post-date">03/29</span><a class="archive-post-title" href= "/2018/03/29/kubernetes-java-client/" >Kubernetes Java Client使用</a>
+            <span class="archive-post-date">03/29</span><a class="archive-post-title" href= "/2018/03/29/kubernetes-configmap-usage/" >Kubernetes ConfigMap使用</a>
         </li>
     
     
         <li class="archive-post-item">
-            <span class="archive-post-date">03/29</span><a class="archive-post-title" href= "/2018/03/29/kubernetes-configmap-usage/" >Kubernetes ConfigMap使用</a>
+            <span class="archive-post-date">03/29</span><a class="archive-post-title" href= "/2018/03/29/kubernetes-java-client/" >Kubernetes Java Client使用</a>
         </li>
     
     
@@ -640,8 +674,6 @@
     
         <span class="sidebar-tag-name" data-tags="kafka"><span class="iconfont-archer">&#xe606;</span>kafka</span>
     
-        <span class="sidebar-tag-name" data-tags="configmap"><span class="iconfont-archer">&#xe606;</span>configmap</span>
-    
         <span class="sidebar-tag-name" data-tags="Elasticsearch"><span class="iconfont-archer">&#xe606;</span>Elasticsearch</span>
     
         <span class="sidebar-tag-name" data-tags="Docker"><span class="iconfont-archer">&#xe606;</span>Docker</span>
@@ -649,6 +681,8 @@
         <span class="sidebar-tag-name" data-tags="Fluentd"><span class="iconfont-archer">&#xe606;</span>Fluentd</span>
     
         <span class="sidebar-tag-name" data-tags="Kibana"><span class="iconfont-archer">&#xe606;</span>Kibana</span>
+    
+        <span class="sidebar-tag-name" data-tags="configmap"><span class="iconfont-archer">&#xe606;</span>configmap</span>
     
         <span class="sidebar-tag-name" data-tags="开发日志"><span class="iconfont-archer">&#xe606;</span>开发日志</span>
     
@@ -693,8 +727,8 @@ jsonContent:
 </div> 
     <script>
     var siteMeta = {
-        root: '/',
-        author: 'Dongamp'
+        root: "/",
+        author: "Dongamp"
     }
 </script>
     <!-- CDN failover -->
@@ -707,15 +741,17 @@ jsonContent:
         }
     </script>
     <script src="/scripts/main.js"></script>
+    <!-- algolia -->
+    
     <!-- busuanzi  -->
     
-    <script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
     
     <!-- CNZZ  -->
     
     </div>
     <!-- async load share.js -->
-    
+     
     </body>
 </html>
 
