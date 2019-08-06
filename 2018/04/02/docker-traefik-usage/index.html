@@ -22,7 +22,7 @@
     <meta name="description" content="">
     <meta http-equiv="Cache-control" content="no-cache">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
-    <title>Docker Swarm集群使用Traefik · Dongamp Studio</title>
+    <title>Docker Swarm集群使用Traefik · Dongamp WebSite</title>
     <style type="text/css">
     @font-face {
         font-family: 'Oswald-Regular';
@@ -411,7 +411,7 @@ height:30vh;
 <p>treafik配置文件:<a href="https://raw.githubusercontent.com/containous/traefik/master/traefik.sample.toml" target="_blank" rel="noopener">https://raw.githubusercontent.com/containous/traefik/master/traefik.sample.toml</a><br>启动traefik服务<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ docker stack deploy -c traefik.yaml traefik</span><br></pre></td></tr></table></figure></p>
 <p>或者</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">docker service create \</span><br><span class="line">    --name traefik \</span><br><span class="line">    --constraint=node.role==manager \</span><br><span class="line">    --publish 80:80 \</span><br><span class="line">    --publish 8080:8080 \</span><br><span class="line">    --mount type=bind,source=/var/run/docker.sock,target=/var/run/docker.sock \</span><br><span class="line">    --mount type=bind,source=/opt/traefik/traefik.toml,target=/etc/traefik/traefik.toml \</span><br><span class="line">    --network traefik-net \</span><br><span class="line">    traefik \</span><br><span class="line">    --docker \</span><br><span class="line">    --docker.swarmmode \</span><br><span class="line">    --docker.domain=maxfun.co \</span><br><span class="line">    --docker.watch \</span><br><span class="line">    --web \</span><br><span class="line">    --api</span><br></pre></td></tr></table></figure>
-<h3 id="部署jenkins应用"><a href="#部署jenkins应用" class="headerlink" title="部署jenkins应用"></a>部署jenkins应用</h3><p>在master节点部署jenkins，不适用端口来访问jenkins</p>
+<h3 id="部署jenkins应用"><a href="#部署jenkins应用" class="headerlink" title="部署jenkins应用"></a>部署jenkins应用</h3><p>在master节点部署jenkins，不使用用端口来访问jenkins</p>
 <p>run-jenkins.sh<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">mkdir -p /opt/jenkins-blueocean-data</span><br><span class="line">MVN_REPO_PATH=/home/coder/developtools/mavenRepository</span><br><span class="line">docker service create \</span><br><span class="line">  --name jenkins \</span><br><span class="line">  --constraint=node.role==manager \</span><br><span class="line">  -u root \</span><br><span class="line">  -e JAVA_OPTS=-Duser.timezone=GMT+08 \</span><br><span class="line">  -e JENKINS_OPTS=--httpPort=8080 \</span><br><span class="line">  --publish 8089:8080 \</span><br><span class="line">  --mount type=bind,source=/opt/jenkins-blueocean-data,target=/var/jenkins_home \</span><br><span class="line">  --mount type=bind,source=/var/run/docker.sock,target=/var/run/docker.sock \</span><br><span class="line">  --mount type=bind,source=$MVN_REPO_PATH,target=/root/.m2/repository \</span><br><span class="line">  --mount type=bind,source=/opt/jenkins-keys,target=/root/.ssh \</span><br><span class="line">  --hostname jenkins \</span><br><span class="line">  --network traefik-net \</span><br><span class="line">  --label traefik.port=8080 \</span><br><span class="line">  --label traefik.docker.network=traefik-net \</span><br><span class="line">  --label traefik.frontend.rule=Host:jenkins.maxfun.co \</span><br><span class="line">  --label traefik.backend=jenkins-backend</span><br><span class="line"> jenkinsci/blueocean:1.3.5</span><br></pre></td></tr></table></figure></p>
 <p>重点参数是下面几个<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">--network traefik-net \</span><br><span class="line">--label traefik.port=8080 \</span><br><span class="line">--label traefik.docker.network=traefik-net \</span><br><span class="line">--label traefik.frontend.rule=Host:jenkins.maxfun.co \</span><br><span class="line"></span><br><span class="line">--network </span><br><span class="line"> 指定已创建好的overlay网络</span><br><span class="line">--label traefik.port=8080</span><br><span class="line"> 注册使用这个端口。当容器暴露出多个端口时非常有效。</span><br><span class="line">--label traefik.docker.network=traefik-net </span><br><span class="line"> 设置连接到这个容器的docker网络。 如果容易被链接到多个网络，</span><br><span class="line"> 一定要设置合适的网络名称（你可以使用docker检查&lt;container_id&gt;）否则它将自动选择一个（取决于docker如何返回它们）。</span><br><span class="line">--label traefik.frontend.rule=Host:jenkins.maxfun.co </span><br><span class="line"> 覆盖默认前端规则（默认：Host:&#123;containerName&#125;.&#123;domain&#125;）</span><br><span class="line">--label traefik.backend=jenkins-backend</span><br><span class="line"> 将容器指向 enkins-backend 后端</span><br><span class="line">--traefik.enable=false</span><br><span class="line"> 可以使用docker service update servicename --label-add traefik.enable=false 调整该service不可用，从而达到把应用从负载均衡列表剔除</span><br><span class="line">JENKINS_OPTS=--httpPort=8080</span><br><span class="line"> jenkins参数 --httpPort自定义jenkins端口</span><br></pre></td></tr></table></figure></p>
 <p>更多traefik容器覆盖默认表现方式的Label：<a href="https://docs.traefik.cn/toml#docker-backend" target="_blank" rel="noopener">https://docs.traefik.cn/toml#docker-backend</a></p>
@@ -447,8 +447,8 @@ height:30vh;
         <li class="previous">
             
                 <div class="prevSlogan">Previous Post</div>
-                <a href= "/2018/03/29/kubernetes-configmap-usage/" title= "Kubernetes ConfigMap使用">
-                    <div class="prevTitle">Kubernetes ConfigMap使用</div>
+                <a href= "/2018/03/29/kubernetes-java-client/" title= "Kubernetes Java Client使用">
+                    <div class="prevTitle">Kubernetes Java Client使用</div>
                 </a>
             
         </li>
@@ -571,14 +571,6 @@ top:30vh;
     <div class="sidebar-content sidebar-content-show-archive">
           <div class="sidebar-panel-archives">
     <!-- 在ejs中将archive按照时间排序 -->
-    
-    
-    
-    
-    
-    
-    
-    
     
     
     

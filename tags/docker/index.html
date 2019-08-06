@@ -22,7 +22,7 @@
     <meta name="description" content="">
     <meta http-equiv="Cache-control" content="no-cache">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
-    <title>Dongamp Studio</title>
+    <title>Dongamp WebSite</title>
     <style type="text/css">
     @font-face {
         font-family: 'Oswald-Regular';
@@ -346,116 +346,30 @@
     
     
     <article class="index-post">
-        <a class="abstract-title" href = "/2018/06/26/kafka-cluster/" >
+        <a class="abstract-title" href = "/2018/05/24/elasticsearch-fluent-kibana/" >
             
-                <span>使用Docker快速搭建Kafka集群</span>
+                <span>Elasticsearch+Fluentd+Kibana使用</span>
         </a>
         <div class="abstract-content">
-            前言工作项目中使用到了MeessageQueue，原来是使用阿里云的MQ，是按使用量收费的，用了一段时间感觉数据量还是蛮大的，所以打算自己搭建消息队列服务器，先前测试过RabbitMQ，使用ra...
+            前言分布式应用，部署在Docker中，日志分散在各个服务器上，为了方便查看日志，在应用中使用Fluentd把日志收集起来，存放到Elasticsearch中，使用Kibana来查看日志，分析等
+...
         </div>
         <div class="abstract-post-meta">
             <!-- date  -->
             <div class="abstract-date">
-                <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2018/06/26</span>
+                <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2018/05/24</span>
             </div>
             <!-- tags  -->
             
             <div class= abstract-tags >
     
-        <a class="post-tag" href="javascript:void(0);" data-tags = "docker">docker</a>
+        <a class="post-tag" href="javascript:void(0);" data-tags = "Elasticsearch">Elasticsearch</a>
     
-        <a class="post-tag" href="javascript:void(0);" data-tags = "kafka">kafka</a>
+        <a class="post-tag" href="javascript:void(0);" data-tags = "Docker">Docker</a>
     
-</div>
-            
-        </div>
-    </article>
+        <a class="post-tag" href="javascript:void(0);" data-tags = "Fluentd">Fluentd</a>
     
-    
-    
-    
-    
-    
-    <article class="index-post">
-        <a class="abstract-title" href = "/2018/04/02/docker-traefik-usage/" >
-            
-                <span>Docker Swarm集群使用Traefik</span>
-        </a>
-        <div class="abstract-content">
-            前言Træfɪk 是一个为了让部署微服务更加便捷而诞生的现代HTTP反向代理、负载均衡工具。 它支持多种后台 (Docker, Swarm, Kubernetes, Marathon, Meso...
-        </div>
-        <div class="abstract-post-meta">
-            <!-- date  -->
-            <div class="abstract-date">
-                <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2018/04/02</span>
-            </div>
-            <!-- tags  -->
-            
-            <div class= abstract-tags >
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags = "docker">docker</a>
-    
-</div>
-            
-        </div>
-    </article>
-    
-    
-    
-    
-    
-    
-    <article class="index-post">
-        <a class="abstract-title" href = "/2018/03/01/Dockerfile-syntax/" >
-            
-                <span>Dockerfile语法结构</span>
-        </a>
-        <div class="abstract-content">
-            Dockerfile语法结构
-Dockerfile 指令Dockerfile 有以下指令选项:
-FROMFROM指定构建镜像的基础源镜像，如果本地没有指定的镜像，则会自动从 Docker 的  ...
-        </div>
-        <div class="abstract-post-meta">
-            <!-- date  -->
-            <div class="abstract-date">
-                <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2018/03/01</span>
-            </div>
-            <!-- tags  -->
-            
-            <div class= abstract-tags >
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags = "docker">docker</a>
-    
-</div>
-            
-        </div>
-    </article>
-    
-    
-    
-    
-    
-    
-    <article class="index-post">
-        <a class="abstract-title" href = "/2018/01/11/docker-install-note/" >
-            
-                <span>安装Docker日志</span>
-        </a>
-        <div class="abstract-content">
-            安装Docker日志
-安装Docker系统要求查看官方文档 https://docs.docker.com/engine/installation/
-CentOS7与Ubuntu下安装Docke...
-        </div>
-        <div class="abstract-post-meta">
-            <!-- date  -->
-            <div class="abstract-date">
-                <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2018/01/11</span>
-            </div>
-            <!-- tags  -->
-            
-            <div class= abstract-tags >
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags = "docker">docker</a>
+        <a class="post-tag" href="javascript:void(0);" data-tags = "Kibana">Kibana</a>
     
 </div>
             
@@ -550,14 +464,6 @@ CentOS7与Ubuntu下安装Docke...
     <div class="sidebar-content sidebar-content-show-archive">
           <div class="sidebar-panel-archives">
     <!-- 在ejs中将archive按照时间排序 -->
-    
-    
-    
-    
-    
-    
-    
-    
     
     
     
@@ -781,6 +687,88 @@ CentOS7与Ubuntu下安装Docke...
         <span class="sidebar-tag-name" data-tags="Kibana"><span class="iconfont-archer">&#xe606;</span>Kibana</span>
     
         <span class="sidebar-tag-name" data-tags="kubernetes"><span class="iconfont-archer">&#xe606;</span>kubernetes</span>
+    
+        <span class="sidebar-tag-name" data-tags="jenkins"><span class="iconfont-archer">&#xe606;</span>jenkins</span>
+    
+        <span class="sidebar-tag-name" data-tags="configmap"><span class="iconfont-archer">&#xe606;</span>configmap</span>
+    
+        <span class="sidebar-tag-name" data-tags="Nginx"><span class="iconfont-archer">&#xe606;</span>Nginx</span>
+    
+        <span class="sidebar-tag-name" data-tags="开发日志"><span class="iconfont-archer">&#xe606;</span>开发日志</span>
+    
+    </div>
+    <div class="iconfont-archer sidebar-tags-empty">&#xe678;</div>
+    <div class="tag-load-fail" style="display: none; color: #ccc; font-size: 0.6rem;">
+    缺失模块。<br/>
+    1、请确保node版本大于6.2<br/>
+    2、在博客根目录（注意不是archer根目录）执行以下命令：<br/>
+    <span style="color: #f75357; font-size: 1rem; line-height: 2rem;">npm i hexo-generator-json-content --save</span><br/>
+    3、在根目录_config.yml里添加配置：
+    <pre style="color: #787878; font-size: 0.6rem;">
+jsonContent:
+  meta: false
+  pages: false
+  posts:
+    title: true
+    date: true
+    path: true
+    text: false
+    raw: false
+    content: false
+    slug: false
+    updated: false
+    comments: false
+    link: false
+    permalink: false
+    excerpt: false
+    categories: true
+    tags: true</pre>
+    </div> 
+    <div class="sidebar-tags-list"></div>
+</div>
+        <div class="sidebar-panel-categories">
+    <div class="sidebar-categories-name">
+    
+        <span class="sidebar-category-name" data-categories="Itext"><span class="iconfont-archer">&#xe60a;</span>Itext</span>
+    
+    </div>
+    <div class="iconfont-archer sidebar-categories-empty">&#xe678;</div>
+    <div class="sidebar-categories-list"></div>
+</div>
+    </div>
+</div> 
+    <script>
+    var siteMeta = {
+        root: "/",
+        author: "Dongamp"
+    }
+</script>
+    <!-- CDN failover -->
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script>
+    <script type="text/javascript">
+        if (typeof window.$ === 'undefined')
+        {
+            console.warn('jquery load from jsdelivr failed, will load local script')
+            document.write('<script src="/lib/jquery.min.js">\x3C/script>')
+        }
+    </script>
+    <script src="/scripts/main.js"></script>
+    <!-- algolia -->
+    
+    <!-- busuanzi  -->
+    
+    <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    
+    <!-- CNZZ  -->
+    
+    </div>
+    <!-- async load share.js -->
+     
+    </body>
+</html>
+
+
+er">&#xe606;</span>kubernetes</span>
     
         <span class="sidebar-tag-name" data-tags="jenkins"><span class="iconfont-archer">&#xe606;</span>jenkins</span>
     
